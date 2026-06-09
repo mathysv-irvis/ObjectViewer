@@ -1,3 +1,5 @@
+import time
+
 from objectViewer import (
     CameraViewer,
     ObjectDetector,
@@ -16,5 +18,13 @@ detector = ObjectDetector(
     model_cfg.imgsz,
 )
 
-camera = CameraViewer(detector, cam_cfg)
-camera.run(disp_cfg)
+camera = CameraViewer(detector, cam_cfg, disp_cfg)
+camera.start()
+
+time.sleep(1)
+
+print(camera.get_object())
+
+time.sleep(1)
+
+camera.stop()

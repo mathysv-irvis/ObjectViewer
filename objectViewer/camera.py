@@ -1,4 +1,5 @@
 from collections import deque
+import threading
 import numpy as np
 import cv2
 
@@ -9,13 +10,21 @@ class CameraViewer:
         self,
         detector,
         config,
+        display
     ):
 
-        self.detector = detector
+        self.object_pos = dict()
 
-        self.cap = cv2.VideoCapture(
-            config.device
-        )
+        self.detector = detector
+        self.display  = display
+        self.callback = None
+        self.running  = False
+        self.thread   = None
+
+        self.centroid_history  = deque(maxlen=8)
+        self.direction_history = deque(maxlen=8)
+
+        self.cap = cv2.VideoCapture(config.device)
 
         self.cap.set(
             cv2.CAP_PROP_FRAME_WIDTH,
@@ -27,14 +36,32 @@ class CameraViewer:
             config.height,
         )
 
-        self.centroid_history  = deque(maxlen=8)
-        self.direction_history = deque(maxlen=8)
+    def get_object(self):
+        return self.object_pos
+
+    def start(self):
+        if self.running:
+            return
+
+        self.running = True
+        self.thread  = threading.Thread(
+            target = self._run,
+            daemon = True
+        )
+        self.thread.start()
+
+    def stop(self):
+        self.running = False
+        if self.thread is not None:
+            self.thread.join()
+
+        self.cap.release()
+        cv2.destroyAllWindows()
 
     def draw(
         self,
         image,
         result,
-        display,
     ):
 
         if result is None:
@@ -42,46 +69,46 @@ class CameraViewer:
 
         x1, y1, x2, y2 = result["bbox"]
 
-        if display.show_roi:
+        if self.display.show_roi:
 
             cv2.rectangle(
                 image,
                 (x1, y1),
                 (x2, y2),
-                display.roi_color,
-                display.thickness,
+                self.display.roi_color,
+                self.display.thickness,
             )
 
         cx, cy = result["centroid"]
 
-        if display.show_centroid:
+        if self.display.show_centroid:
 
             cv2.circle(
                 image,
                 (cx, cy),
                 5,
-                display.centroid_color,
+                self.display.centroid_color,
                 -1,
             )
 
         if (
-            display.show_direction
+            self.display.show_direction
             and result["direction"] is not None
         ):
 
             dx, dy = result["direction"]
 
             end = (
-                int(cx + dx * display.arrow_length),
-                int(cy + dy * display.arrow_length),
+                int(cx + dx * self.display.arrow_length),
+                int(cy + dy * self.display.arrow_length),
             )
 
             cv2.arrowedLine(
                 image,
                 (cx, cy),
                 end,
-                display.direction_color,
-                display.thickness,
+                self.display.direction_color,
+                self.display.thickness,
             )
 
         return image
@@ -130,13 +157,48 @@ class CameraViewer:
 
         return result
 
-    def run(
-        self,
-        display,
-    ):
-        roi_size = display.roi_size
+    def select_object(self, boxes):
 
-        while True:
+        if len(boxes) == 0:
+            return None
+
+        if self.last_centroid is None:
+            box = boxes[0]
+        else:
+            best_dist = float("inf")
+            best_box = None
+
+            for box in boxes:
+                x1, y1, x2, y2 = box
+
+                cx = (x1 + x2) / 2
+                cy = (y1 + y2) / 2
+
+                dist = np.hypot(
+                    cx - self.last_centroid[0],
+                    cy - self.last_centroid[1],
+                )
+
+                if dist < best_dist:
+                    best_dist = dist
+                    best_box = box
+
+            box = best_box
+
+        x1, y1, x2, y2 = box
+
+        self.last_centroid = (
+            (x1 + x2) / 2,
+            (y1 + y2) / 2,
+        )
+
+        return box
+
+    def _run(self):
+
+        roi_size = self.display.roi_size
+
+        while self.running:
 
             ret, frame = self.cap.read()
 
@@ -150,10 +212,14 @@ class CameraViewer:
                 result["centroid"] = self.filter_centroid(result["centroid"])
                 result["direction"] = self.filter_direction(result["direction"])
 
+                self.object_pos = {
+                    "centroid"  : result["centroid"],
+                    "direction" : result["direction"]
+                    }
+
             frame = self.draw(
                 frame,
                 result,
-                display,
             )
 
             cv2.imshow(
