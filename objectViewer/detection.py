@@ -19,11 +19,12 @@ class ObjectDetector:
 
     def process(self, image):
 
-        result = self.model.predict(
+        result = self.model.track(
             image,
             imgsz=self.imgsz,
             conf=self.conf,
             verbose=False,
+            persist=True,
         )[0]
 
         if len(result.boxes) == 0:
