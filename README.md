@@ -3,7 +3,7 @@
 
 ## Overview
 
-ObjectViewer is a lightweight Python library for detecting and visualizing pipes using YOLO segmentation models and OpenCV.
+ObjectViewer is a lightweight Python library for detecting and visualizing objects using YOLO segmentation models and OpenCV.
 
 The library provides a simple interface for:
 
@@ -34,7 +34,7 @@ The project is designed to be easily integrated into robotics, automation, and c
 # Project Structure
 
 ```text
-pipeViewer/
+ObjectViewer/
 │
 ├── __init__.py
 ├── camera.py
@@ -46,7 +46,7 @@ pipeViewer/
 | File           | Description                                     |
 | -------------- | ----------------------------------------------- |
 | `camera.py`    | Camera acquisition and visualization utilities  |
-| `detection.py` | YOLO inference and pipe processing algorithms   |
+| `detection.py` | YOLO inference and object processing algorithms   |
 | `config.py`    | Camera, model and display configuration classes |
 | `utils.py`     | Optional helper functions                       |
 
@@ -57,8 +57,8 @@ pipeViewer/
 Clone the repository:
 
 ```bash
-git clone <repository_url>
-cd pipeViewer
+git clone https://github.com/mathysv-irvis/ObjectViewer.git
+cd ObjectViewer
 ```
 
 Install the required dependencies:
@@ -84,7 +84,7 @@ pip install -e .
 # Basic Usage
 
 ```python
-from pipeViewer import (
+from objectViewer import (
     Camera,
     ObjectDetector,
     CameraConfig,
@@ -132,8 +132,8 @@ Each inference returns a dictionary containing the processed information:
 | Field       | Description                                   |
 | ----------- | --------------------------------------------- |
 | `mask`      | Binary segmentation mask                      |
-| `centroid`  | Center of the detected pipe                   |
-| `direction` | Unit vector representing the pipe orientation |
+| `centroid`  | Center of the detected object                   |
+| `direction` | Unit vector representing the object orientation |
 
 ---
 
@@ -174,12 +174,8 @@ This allows camera parameters, model settings and visualization options to be mo
 
 The current implementation serves as a foundation for additional features, including:
 
-* Skeleton-based orientation estimation
-* Multi-pipe detection and tracking
-* 3D pipe pose estimation
-* ROS2 integration
-* Intel RealSense support
-* Stereo vision support
+* Multi-object detection and tracking
+* 3D object pose estimation
 
 ---
 
