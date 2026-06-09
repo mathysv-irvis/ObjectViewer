@@ -2,6 +2,7 @@ from collections import deque
 import threading
 import numpy as np
 import cv2
+import platform
 
 
 class CameraViewer:
@@ -24,7 +25,10 @@ class CameraViewer:
         self.centroid_history  = deque(maxlen=8)
         self.direction_history = deque(maxlen=8)
 
-        self.cap = cv2.VideoCapture(config.device)
+        if platform.system() == "Windows":
+            self.cap = cv2.VideoCapture(config.device, cv2.CAP_DSHOW)
+        else:
+            self.cap = cv2.VideoCapture(config.device)
 
         self.cap.set(
             cv2.CAP_PROP_FRAME_WIDTH,
@@ -216,6 +220,11 @@ class CameraViewer:
                     "centroid"  : result["centroid"],
                     "direction" : result["direction"]
                     }
+            else:
+                self.object_pos = {
+                    "centroid"  : None,
+                    "direction" : None
+                }
 
             frame = self.draw(
                 frame,

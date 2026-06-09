@@ -23,7 +23,7 @@ if __name__ == "__main__":
     camera = CameraViewer(detector, cam_cfg, disp_cfg)
     camera.start()
 
-    for _ in range(10):
+    for _ in range(20):
         time.sleep(0.5)
         print(camera.get_object())
 
