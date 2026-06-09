@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass
 
 
@@ -14,11 +13,12 @@ class ModelConfig:
     model_path: str   = "./models/runs_pipe/detect/train/weights/last.pt"
     conf      : float = 0.7
     imgsz     : int   = 640
+        ret, frame = self.c
 
 
 @dataclass
 class DisplayConfig:
-    roi_size       : int   = 200
+    roi_size       : int   = 10000
     show_roi       : bool  = True
     show_centroid  : bool  = True
     show_direction : bool  = True

@@ -1,4 +1,3 @@
-
 import cv2
 
 
@@ -25,6 +24,8 @@ class CameraViewer:
             cv2.CAP_PROP_FRAME_HEIGHT,
             config.height,
         )
+
+        self.roi_size = config.roi_size
 
     def draw(
         self,
@@ -82,7 +83,7 @@ class CameraViewer:
 
         return image
 
-    def filter_roi_size(self, result, roi_size):
+   def filter_roi_size(self, result):
         if result is None:
             return None
 
@@ -91,7 +92,7 @@ class CameraViewer:
         width = x2 - x1
         height = y2 - y1
 
-        if max(width, height) > roi_size:
+        if max(width, height) > self.roi_size:
             return None
 
         return result
@@ -100,7 +101,6 @@ class CameraViewer:
         self,
         display,
     ):
-        roi_size = display.roi_size
 
         while True:
 
@@ -110,7 +110,7 @@ class CameraViewer:
                 break
 
             result = self.detector.process(frame)
-            result = self.filter_roi_size(result, roi_size)
+            result = self.filter_roi_size(result)
 
             frame = self.draw(
                 frame,
@@ -119,7 +119,7 @@ class CameraViewer:
             )
 
             cv2.imshow(
-                "ObjectViewer",
+                "PipeViewer",
                 frame,
             )
 
