@@ -1,30 +1,30 @@
 import time
 
-from objectViewer import (
-    CameraViewer,
-    ObjectDetector,
-    CameraConfig,
-    ModelConfig,
-    DisplayConfig,
-)
+if __name__ == "__main__":
 
-cam_cfg   = CameraConfig()
-model_cfg = ModelConfig()
-disp_cfg  = DisplayConfig()
+    from objectViewer import (
+        CameraViewer,
+        ObjectDetector,
+        CameraConfig,
+        ModelConfig,
+        DisplayConfig,
+    )
 
-detector = ObjectDetector(
-    model_cfg.model_path,
-    model_cfg.conf,
-    model_cfg.imgsz,
-)
+    cam_cfg   = CameraConfig()
+    model_cfg = ModelConfig()
+    disp_cfg  = DisplayConfig()
 
-camera = CameraViewer(detector, cam_cfg, disp_cfg)
-camera.start()
+    detector = ObjectDetector(
+        model_cfg.model_path,
+        model_cfg.conf,
+        model_cfg.imgsz,
+    )
 
-time.sleep(1)
+    camera = CameraViewer(detector, cam_cfg, disp_cfg)
+    camera.start()
 
-print(camera.get_object())
+    for _ in range(10):
+        time.sleep(0.5)
+        print(camera.get_object())
 
-time.sleep(1)
-
-camera.stop()
+    camera.stop()

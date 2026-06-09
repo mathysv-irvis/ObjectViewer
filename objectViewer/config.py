@@ -1,4 +1,4 @@
-
+from pathlib import Path
 from dataclasses import dataclass
 
 
@@ -11,7 +11,7 @@ class CameraConfig:
 
 @dataclass
 class ModelConfig:
-    model_path: str   = "./models/runs_pipe/detect/train/weights/last.pt"
+    model_path: Path = Path("models") / "runs_pipe" / "detect" / "train" / "weights" / "last.pt"
     conf      : float = 0.7
     imgsz     : int   = 640
 
