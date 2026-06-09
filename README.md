@@ -1,17 +1,17 @@
 
-# PipeViewer
+# ObjectViewer
 
 ## Overview
 
-PipeViewer is a lightweight Python library for detecting and visualizing pipes using YOLO segmentation models and OpenCV.
+ObjectViewer is a lightweight Python library for detecting and visualizing pipes using YOLO segmentation models and OpenCV.
 
 The library provides a simple interface for:
 
 * Camera acquisition
 * YOLO inference
-* Pipe segmentation
+* Object detection
 * Centroid computation
-* Pipe orientation estimation
+* Object orientation estimation
 * Real-time visualization of detection results
 
 The project is designed to be easily integrated into robotics, automation, and computer vision pipelines.
@@ -23,7 +23,7 @@ The project is designed to be easily integrated into robotics, automation, and c
 * YOLO segmentation inference
 * Binary mask extraction
 * Centroid computation using image moments
-* Pipe direction estimation
+* Object direction estimation
 * ROI visualization
 * Centroid visualization
 * Direction vector visualization
@@ -86,7 +86,7 @@ pip install -e .
 ```python
 from pipeViewer import (
     Camera,
-    PipeDetector,
+    ObjectDetector,
     CameraConfig,
     ModelConfig,
     DisplayConfig,
@@ -101,7 +101,7 @@ model_cfg = ModelConfig(
 
 display_cfg = DisplayConfig()
 
-detector = PipeDetector(
+detector = ObjectDetector(
     model_path=model_cfg.model_path,
     conf=model_cfg.conf,
     imgsz=model_cfg.imgsz,
