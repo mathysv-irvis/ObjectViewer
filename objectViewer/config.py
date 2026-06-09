@@ -18,8 +18,8 @@ class ModelConfig:
 
 @dataclass
 class DisplayConfig:
-    roi_size       : int   = 200
-    show_roi       : bool  = True
+    roi_size       : int   = 170
+    show_roi       : bool  = False
     show_centroid  : bool  = True
     show_direction : bool  = True
     roi_color      : tuple = (0, 255, 0)

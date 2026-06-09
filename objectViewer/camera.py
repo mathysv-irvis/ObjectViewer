@@ -1,4 +1,5 @@
-
+from collections import deque
+import numpy as np
 import cv2
 
 
@@ -25,6 +26,9 @@ class CameraViewer:
             cv2.CAP_PROP_FRAME_HEIGHT,
             config.height,
         )
+
+        self.centroid_history  = deque(maxlen=8)
+        self.direction_history = deque(maxlen=8)
 
     def draw(
         self,
@@ -82,6 +86,36 @@ class CameraViewer:
 
         return image
 
+    def filter_direction(self, direction):
+
+        if direction is None:
+            return None
+
+        self.direction_history.append(direction)
+
+        dx = np.mean([d[0] for d in self.direction_history])
+        dy = np.mean([d[1] for d in self.direction_history])
+
+        norm = np.hypot(dx, dy)
+
+        if norm > 0:
+            dx /= norm
+            dy /= norm
+
+        return (dx, dy)
+
+    def filter_centroid(self, centroid):
+
+        if centroid is None:
+            return None
+
+        self.centroid_history.append(centroid)
+
+        x = int(np.mean([c[0] for c in self.centroid_history]))
+        y = int(np.mean([c[1] for c in self.centroid_history]))
+
+        return (x, y)
+
     def filter_roi_size(self, result, roi_size):
         if result is None:
             return None
@@ -111,6 +145,10 @@ class CameraViewer:
 
             result = self.detector.process(frame)
             result = self.filter_roi_size(result, roi_size)
+
+            if result is not None:
+                result["centroid"] = self.filter_centroid(result["centroid"])
+                result["direction"] = self.filter_direction(result["direction"])
 
             frame = self.draw(
                 frame,
